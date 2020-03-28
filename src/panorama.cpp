@@ -3468,7 +3468,121 @@ void Panorama::calcOpticalFlow(){
 }
 
 
-void Panorama::getTranslationByOpticalFlow(){
+void Panorama::getTranslationByOpticalFlow() {
+
+    vector<int> x_vec(100, 0);
+    vector<int> y_vec(100, 0);
+    int Width = imList[0].image.cols;
+    int Height = imList[0].image.rows;
+    int max_frame = imList.size();
+
+    Mat source(Height, Width, CV_8UC1);
+    Mat HIS_source(Height, Width, CV_8UC1);
+
+    string file_name = _txt_folder + "/translation.txt";
+    ofstream outputfile(file_name);
+
+    for (int frame = 0; frame < max_frame; frame++) {
+        source = imList[frame].image.clone();
+        Mat disp = source.clone();
+        cvtColor(source, source, CV_BGR2GRAY);
+
+        if (frame > 0) {
+
+            vector<cv::Point2f> prev_pts;
+            vector<cv::Point2f> next_pts;
+
+            Size flowSize(100, 100); //ベクトルの数
+            Point2f center = cv::Point(source.cols / 2., source.rows / 2.);
+            for (int i = 0; i < flowSize.width; ++i) {
+                for (int j = 0; j < flowSize.width; ++j) {
+                    Point2f p(i * float(source.cols) / (flowSize.width - 1),
+                              j * float(source.rows) / (flowSize.height - 1));
+                    prev_pts.push_back((p - center) * 0.95f + center);
+                }
+            }
+
+            Mat flow;
+            vector<float> error;
+
+//            cv::Mat mask = cv::imread(MASK_DIR + "/image" + digitString(frame, 4) +".jpg", IMREAD_GRAYSCALE);
+            cv::Mat mask = imList[frame].maskimage;
+
+            imshow("sourcess", source);
+            int c = waitKey(1);
+            calcOpticalFlowFarneback(HIS_source.clone(), source.clone(), flow, 0.8, 10, 15, 3, 5, 1.1, 0);
+
+            // オプティカルフローの表示
+            std::vector<cv::Point2f>::const_iterator p = prev_pts.begin();
+            std::vector<cv::Point2f> opti_vec;
+            int x = 0;
+            int y = 0;
+
+            for (auto &x : x_vec) {
+                x = 0;
+            }
+            for (auto &y : y_vec) {
+                y = 0;
+            }
+
+            for (; p != prev_pts.end(); ++p) {
+                cv::Point2f &fxy = flow.at<cv::Point2f>(p->y, p->x);
+                if (mask.at<unsigned char>(p->y, p->x) == 0) {
+                    fxy = cv::Point2f(0, 0);
+                } else {
+                    int fx = int(fxy.x);
+                    int fy = int(fxy.y);
+                    if ((fx) < 0) {
+                        opti_vec.push_back(fxy);
+                        x_vec[-fx] += 1;
+                    }
+                    if ((fy) < 0) {
+                        opti_vec.push_back(fxy);
+                        y_vec[-fy] += 1;
+                    }
+                    x += fxy.x;
+                    y += fxy.y;
+                }
+                cv::line(disp, *p, *p + fxy * 8, cv::Scalar(0), 1);
+            }
+
+            int max_x = 1;
+            int max_idx = 0;
+            for (int k = 0; k < x_vec.size(); ++k) {
+                if (max_x <= x_vec[k]) {
+                    if (k >= imList[frame - 1].translation.x - 1) {
+                        if (abs(k - imList[frame - 1].translation.x) <= 2) {
+                            max_x = x_vec[k];
+                            max_idx = k;
+                        }
+                    }
+                }
+            }
+            if (max_idx == 0)
+                max_idx = imList[frame - 1].translation.x;
+            cout << max_idx << endl;
+
+            int max_y = 0;
+            int max_idy = 0;
+            for (int k = 0; k < y_vec.size(); ++k) {
+                if (max_y < y_vec[k]) {
+//                    if (abs (k - preidy) <= 2) {
+                    max_y = y_vec[k];
+                    max_idy = k;
+//                    }
+                }
+            }
+
+            imList[frame].translation = cv::Point2f(max_idx, max_idy);
+//            PinP_tr(HIS_source, source, max_idx, max_idy, true);
+            HIS_source = source.clone();
+        } else {
+            imList[frame].translation = cv::Point2f(0, 0);
+        }
+        outputfile << imList[frame].translation.x << " " << imList[frame].translation.y << endl;
+    }
+    printf("hoge");
+}
 //    for(int frameID=0; frameID<imList.size(); frameID++){
 //        Mat source(Height,Width,CV_8UC1);
 //        Mat HIS_source(Height,Width,CV_8UC1);
@@ -3570,7 +3684,7 @@ void Panorama::getTranslationByOpticalFlow(){
 //        frameID+=1;
 //    }
 //    waitKey(0);
-}
+//}
 
 void Panorama::translateImage() {
     cv::Mat im1, im2;
@@ -3636,10 +3750,10 @@ void Panorama::translateImage() {
 void Panorama::getTranslation(){
     string file_name = _txt_folder + "/translation.txt";
     if(!checkFileExistence(file_name)) {
-//    this->getTranslationByOpticalFlow();
+        this->getTranslationByOpticalFlow();
 //    this->featurePointFindHomography();
 //    this->getTranslationByTempMatching();
-        getTranslationByMyTempMatching();
+//        getTranslationByMyTempMatching();
         //テキストファイル準備
         ofstream outputfile(file_name);
         for(ImageInfo im : imList){

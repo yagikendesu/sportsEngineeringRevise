@@ -116,7 +116,7 @@ void yagi::outputTextFromVideo(const std::string video_path, const std::string i
             //img = crop;
              // 先鋭化フィルタを適用する
            // cv::filter2D(img, img, img.depth(), sharpningKernel4);
-            cv::resize(img, img, Size(), 640.0 / img.cols, 320.0 / img.rows);
+//            cv::resize(img, img, Size(), 640.0 / img.cols, 320.0 / img.rows);
             //cv::Mat dummy = cv::Mat::zeros(img.cols, img.rows * (img.), CV_32FC3);
 
             auto datumProcessed = opWrapper.emplaceAndPop(img);

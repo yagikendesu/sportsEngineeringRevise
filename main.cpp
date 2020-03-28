@@ -21,9 +21,9 @@ using namespace cv;
 
 int main() {
 //    string folder_path = "/home/yagi/sfmDR/inputVideos/" + video_name + "/";
- Panorama Panorama("2017_London_w2");
+ Panorama Panorama("woman_2015_yosen_5");
  Panorama.INIT_PROCESSING = false;
- Panorama.videoType = ".MOV";
+ Panorama.videoType = ".mp4";
     Panorama.USE_LASTMASK = false;
     Panorama.USE_LAST_TRACKLINE = false;
     Panorama.USE_LAST_CORNERS = false;
