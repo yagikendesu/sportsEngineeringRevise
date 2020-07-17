@@ -1,4 +1,5 @@
 
+![図1](https://user-images.githubusercontent.com/28588776/87768597-58751700-c857-11ea-888e-4aa4f2dc9033.png)
 
 ### 
 
