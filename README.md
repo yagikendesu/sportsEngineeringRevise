@@ -1,45 +1,14 @@
-# Team Prism 足あと検出
 
-### 今後やること
-- 接地位置推定
-    1. OpenPoseの関節位置を使って2クラス分類問題として推定
-    2. 関節位置と直線の距離のピークから計算
-    
-- パノラマ画像生成
-    1. 画像中直線の角度からトランスレーションを補正
-        並行移動だけでなく回転も行う
-        トランスレーション推定がうまくいかない原因
-    2. OpticalFlow
-    3. トラック内はHスケール、トラック外はgrayスケール
-    
-- トラッキング(歩数推定の精度に大きく影響)
-    1. OpenPoseの関節位置
-    2. 複数パラメータ
-        1. カラーヒストグラム
-        2. 関節位置と直線の距離
-        3. 前フレーム人物との距離
-        4. フレーム情報
-        
-- OpenPose検出
-    - 矩形を入力
-    
- ### 論文書くこと
-    - 左右の足の区別
-        - openposeの精度向上によって可能
-        - レーン毎の精度 
-        
-        
- #### 2/13やること
-    - 接地点の補正
-        - 挿入、削除を行う関数の実装
-        - stride pitchの更新を行う関数
-        - スタートから一定距離は関数変える
-        - ピッチとストライドの値から正しい点かどうか判定するためのスコア関数
-    
-    - 進捗
-        - 最適化の実装
-        - 10m毎の速度求める    
- ### 2/14
-    - 別のモデルでフィッティング
-    - ピッチ一定であることを利用して補完
-    - 小領域に関しては平均で埋めてもいいかも
+
+### 
+
+### Citation
+```
+@inproceedings{yagi2018estimation,
+  title={Estimation of Runners' Number of Steps, Stride Length and Speed Transition from Video of a 100-Meter Race},
+  author={Yagi, Kentaro and Hasegawa, Kunihiro and Sugiura, Yuta and Saito, Hideo},
+  booktitle={Proceedings of the 1st International Workshop on Multimedia Content Analysis in Sports},
+  pages={87--95},
+  year={2018}
+}
+
